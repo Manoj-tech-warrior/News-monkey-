@@ -11,3 +11,15 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Body pe extra scroll aur horizontal shift fix */
+
+.infinite-scroll-component{
+  overflow: hidden !important;
+}
+.navbar{
+  position: fixed;
+}
+.text-center{
+margin-top: 110px;
+}
