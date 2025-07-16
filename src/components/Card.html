@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Card</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #ff7eb3, #ff758c, #feb47b);
+            background-size: 400% 400%;
+            animation: gradientBackground 6s ease infinite;
+        }
+
+        @keyframes gradientBackground {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .profile-card {
+            perspective: 1000px;
+            width: 300px;
+            height: 400px;
+        }
+
+        .profile-card-inner {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.9s;
+        }
+
+        .profile-card:hover .profile-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .profile-card-front, .profile-card-back {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-card-front {
+            background: #87e2de;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .profile-card-front img {
+            width: 100%;
+            height: auto;
+        }
+
+        .profile-card-front .card-content {
+            padding: 20px;
+        }
+        .profile-card-back .card-content {
+            padding: 20px;
+        }
+
+        .profile-card-front h2 {
+            margin: 10px 0;
+            font-size: 22px;
+            color: #333333;
+        }
+        .profile-card-back h2 {
+            margin: 10px 0;
+            font-size: 22px;
+            color: #333333;
+        }
+        #Manoj{
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 0px;
+            color: rgb(42, 40, 40);
+        }
+
+
+        .profile-card-front p {
+            font-size: 14px;
+            color: #777777;
+            margin: 10px 0;
+        }
+
+        .profile-card-front .social-links {
+            margin-top: 15px;
+        }
+
+        .profile-card-front .social-links a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #ff758c;
+            font-size: 20px;
+        }
+
+        .profile-card-front .social-links a:hover {
+            color: #feb47b;
+        }
+
+        .profile-card-back {
+            background: linear-gradient(135deg, #64aceb, #6ed5ec);
+            transform: rotateY(180deg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-card">
+        <div class="profile-card-inner">
+            <div class="profile-card-front">
+
+                <div class="card-content">
+                    <h2>CODE-WARRIOR </h2>
+                    <p id="Manoj">:-  Manoj Kumar</p>
+                    <p>Web Developer | Designer | Coder</p>
+                    <div class="social-links">
+                        <a href="#">&#x1F465;</a>
+                        <a href="#">&#x1F4F1;</a>
+                        <a href="#">&#x2709;</a>
+                    </div>
+                </div>
+            </div>
+            <div class="profile-card-back">
+              <h2>Profile</h2>
+                <P>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos, laudantium ratione?
+
+                </P>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
