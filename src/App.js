@@ -9,7 +9,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 function App() {
   return (
     <>
-      <Router basename='/News-Monkey'>
+      <Router basename='/News-monkey-'>
         <Navbar />
         <Routes>
           <Route exact path="/general" element={<News key="home-general" pageSize={6} category="general" />} />

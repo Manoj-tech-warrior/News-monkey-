@@ -3,110 +3,132 @@ import Newsitem from './Newsitem';
 import Spinner from './Spinner';
 import InfiniteScroll from "react-infinite-scroll-component";
 
-const News = (props)=>  {
+const News = (props) => {
 
-    const CapitalizeFirstLetter = (string)=> {
-        return string[0].toUpperCase() + string.slice(1);
-    }
-    document.title = `${CapitalizeFirstLetter(props.category)} - NewsMonkey`;
+  // Utility to capitalize
+  const CapitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
 
-    const [articles, setArticles] = useState([])
-    const [Loading, setLoading] = useState(true)
-    const [page, setPage] = useState(1)
-    const [totalResults, setTotalResults] = useState(0)
+  document.title = `${CapitalizeFirstLetter(props.category)} - NewsMonkey`;
 
-    // ✅ Yaha apna backend ka URL use kar
-    const backendBaseUrl = "http://news-backend-jp4z.onrender.com"; 
-    // Deploy hone ke baad replace kar dena:
-    // const backendBaseUrl = "https://<your-backend>.onrender.com";
+  // State
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalResults, setTotalResults] = useState(0);
 
-    const fetchNews = useCallback(async()=> {
-        try {
-            setLoading(true);
-            let url = `${backendBaseUrl}/api/news?category=${props.category}&pageSize=${props.pageSize}&page=1`;
-            let data = await fetch(url);
-            let parsedData = await data.json();
-            console.log(parsedData);
+  // ✅ Read backend URL from env
+  const backendBaseUrl = process.env.REACT_APP_BACKEND_URL || "https://news-backend-jp4z.onrender.com";
 
-            if (parsedData.articles && Array.isArray(parsedData.articles)) {
-                setArticles(parsedData.articles);
-                setTotalResults(parsedData.totalResults || 0);
-            } else {
-                setArticles([]);
-                setTotalResults(0);
-            }
-            setPage(2); 
-        } catch (error) {
-            console.error('Error fetching news:', error);
-            setArticles([]);
-            setTotalResults(0);
-        } finally {
-            setLoading(false);
-        }
-    }, [props.category, props.pageSize]);
+  // Fetch first page
+  const fetchNews = useCallback(async () => {
+    try {
+      setLoading(true);
+      const url = `${backendBaseUrl}/api/news?category=${props.category}&pageSize=${props.pageSize}&page=1`;
+      console.log("🔗 Fetching:", url);
 
-    useEffect(()=>{
+      const response = await fetch(url);
+      if (!response.ok) {
+        console.error("❌ Error status:", response.status);
         setArticles([]);
-        setPage(1);
-        fetchNews();
-    }, [props.category, fetchNews]);
+        setTotalResults(0);
+        return;
+      }
 
-    const fetchMoreData = async()=> {
-        try {
-            setLoading(true);
-            let url = `${backendBaseUrl}/api/news?category=${props.category}&pageSize=${props.pageSize}&page=${page}`;
-            let data = await fetch(url);
-            let parsedData = await data.json();
-            console.log(parsedData);
+      const parsedData = await response.json();
+      console.log("✅ Data fetched:", parsedData);
 
-            if (parsedData.articles && Array.isArray(parsedData.articles)) {
-                setArticles((prevArticles) => {
-                    const allArticles = [...prevArticles, ...parsedData.articles];
-                    const uniqueArticles = allArticles.filter((article, index, self) =>
-                        index === self.findIndex((a) => a.url === article.url)
-                    );
-                    return uniqueArticles;
-                });
-                setPage(prevPage => prevPage + 1);
-            }
-        } catch (error) {
-            console.error('Error fetching more news:', error);
-        } finally {
-            setLoading(false);
-        }
+      if (parsedData.articles && Array.isArray(parsedData.articles)) {
+        setArticles(parsedData.articles);
+        setTotalResults(parsedData.totalResults || 0);
+        setPage(2);
+      } else {
+        setArticles([]);
+        setTotalResults(0);
+      }
+    } catch (err) {
+      console.error("🔥 Error fetching news:", err);
+      setArticles([]);
+      setTotalResults(0);
+    } finally {
+      setLoading(false);
     }
+  }, [props.category, props.pageSize, backendBaseUrl]);
 
-    return (
-        <div className='container my-3'>
-            <h2 className='text-center sticky '>
-                <b>News-Monkey Top Headlines - News from {CapitalizeFirstLetter(props.category)}</b>
-            </h2>
-            {Loading && articles.length === 0 && <Spinner/>}
-            <InfiniteScroll
-                next={fetchMoreData}
-                hasMore={articles.length < totalResults}
-                dataLength={articles.length}
-                loader={<Spinner/>}
-            > 
-                <div className="container">
-                    <div className="row">
-                        {articles && articles.length > 0 && articles.map((element) => { 
-                            return (
-                                <div className='col-md-4 my-5' key={element.url}>
-                                    <Newsitem 
-                                        title={element.title} 
-                                        Description={element.description} 
-                                        imageUrl={element.urlToImage}
-                                        newsUrl={element.url} 
-                                    />
-                                </div>
-                            );
-                        })}
-                    </div>
+  useEffect(() => {
+    setArticles([]);
+    setPage(1);
+    fetchNews();
+  }, [props.category, fetchNews]);
+
+  // Fetch more data for infinite scroll
+  const fetchMoreData = async () => {
+    try {
+      const url = `${backendBaseUrl}/api/news?category=${props.category}&pageSize=${props.pageSize}&page=${page}`;
+      console.log("📥 Loading more:", url);
+
+      const response = await fetch(url);
+      if (!response.ok) {
+        console.error("❌ Error status on load more:", response.status);
+        return;
+      }
+
+      const parsedData = await response.json();
+      console.log("✅ More data:", parsedData);
+
+      if (parsedData.articles && Array.isArray(parsedData.articles)) {
+        setArticles((prevArticles) => {
+          const allArticles = [...prevArticles, ...parsedData.articles];
+          // remove duplicates by url
+          const uniqueArticles = allArticles.filter(
+            (article, index, self) =>
+              index === self.findIndex((a) => a.url === article.url)
+          );
+          return uniqueArticles;
+        });
+        setPage((prevPage) => prevPage + 1);
+      }
+    } catch (err) {
+      console.error("🔥 Error fetching more news:", err);
+    }
+  };
+
+  return (
+    <div className="container my-3">
+      <h2 className="text-center sticky">
+        <b>
+          News-Monkey Top Headlines - News from {CapitalizeFirstLetter(props.category)}
+        </b>
+      </h2>
+
+      {loading && articles.length === 0 && <Spinner />}
+
+      <InfiniteScroll
+        next={fetchMoreData}
+        hasMore={articles.length < totalResults}
+        dataLength={articles.length}
+        loader={<Spinner />}
+      >
+        <div className="container">
+          <div className="row">
+            {articles &&
+              articles.length > 0 &&
+              articles.map((element) => (
+                <div className="col-md-4 my-5" key={element.url}>
+                  <Newsitem
+                    title={element.title}
+                    Description={element.description}
+                    imageUrl={element.urlToImage}
+                    newsUrl={element.url}
+                  />
                 </div>
-            </InfiniteScroll>
+              ))}
+          </div>
         </div>
-    );
-}
+      </InfiniteScroll>
+    </div>
+  );
+};
 
 export default News;

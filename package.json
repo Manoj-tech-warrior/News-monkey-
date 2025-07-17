@@ -2,7 +2,7 @@
   "name": "project-2-app",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://manoj-tech-warrior.github.io/News-monkey",
+"homepage": "https://manoj-tech-warrior.github.io/News-monkey-",
   "dependencies": {
     "ajv": "^8.17.1",
     "react": "^19.0.0",
@@ -19,6 +19,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "server": "cd backend && npm run dev",
+    "predeploy": "npm run build",
+     "deploy": "gh-pages -d build",
     "dev": "concurrently \"npm run server\" \"npm start\""
   },
   "eslintConfig": {
@@ -44,6 +46,6 @@
     "gh-pages": "^6.3.0"
   },
   "engines": {
-  "node": "18.x"
-}
+    "node": "18.x"
+  }
 }
